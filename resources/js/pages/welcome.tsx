@@ -1,6 +1,26 @@
 import { Head } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
 
 export default function Welcome() {
+    const [backendMessage, setBackendMessage] = useState('Loading backend response...');
+    const [error, setError] = useState<string | null>(null);
+    console.log(backendMessage);
+    useEffect(() => {
+        fetch('/api/hello')
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then((data) => {
+                setBackendMessage(data.message || 'No message returned');
+            })
+            .catch(() => {
+                setError('Failed to fetch backend message');
+            });
+    }, []);
+
     return (
         <>
             <Head title="Welcome" />
@@ -16,6 +36,13 @@ export default function Welcome() {
                                 <br />
                                 We suggest starting with the following.
                             </p>
+                            <div className="rounded-xl border border-[#e3e3e0] bg-[#f8f8f8] p-4 text-sm text-[#333] dark:border-[#2b2b2b] dark:bg-[#101010] dark:text-[#f8f8f2]">
+                                <strong className="block mb-1">Backend GET response:</strong>
+                                <p className="mb-1">{error ?? backendMessage}</p>
+                                <p className="text-xs text-[#6b6b6b] dark:text-[#8d8d8d]">
+                                    Fetching from <code>/api/hello</code>
+                                </p>
+                            </div>
                             <ul className="mb-4 flex flex-col lg:mb-6">
                                 <li className="relative flex items-center gap-4 py-2 before:absolute before:top-1/2 before:bottom-0 before:left-[0.4rem] before:border-l before:border-[#e3e3e0] dark:before:border-[#3E3E3A]">
                                     <span className="relative bg-white py-1 dark:bg-[#161615]">
