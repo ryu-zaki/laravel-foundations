@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link, usePage } from '@inertiajs/react';
 
 // ==========================================
 // TYPES & INTERFACES
@@ -31,6 +32,8 @@ const PRODUCTS: Product[] = [
 const CATEGORIES: string[] = ['All', 'Audio', 'Accessories', 'Wearables', 'Displays'];
 
 export default function WelcomePage(): React.JSX.Element {
+  const { auth } = usePage().props as any;
+  
   // ==========================================
   // STATE MANAGEMENT
   // ==========================================
@@ -103,6 +106,34 @@ export default function WelcomePage(): React.JSX.Element {
               {cartCount}
             </span>
           </button>
+
+          {/* AUTH NAVIGATION */}
+          <div className="flex items-center gap-3">
+            {auth?.user ? (
+              <>
+                <Link href="/profile" className="text-sm font-medium text-slate-700 hover:text-blue-600 transition">
+                  {auth.user.name}
+                </Link>
+                <Link
+                  href="/logout"
+                  method="post"
+                  as="button"
+                  className="rounded-lg bg-red-50 px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-100 transition border border-red-200"
+                >
+                  Logout
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link href="/login" className="text-sm font-medium text-slate-700 hover:text-blue-600 transition">
+                  Sign in
+                </Link>
+                <Link href="/signup" className="rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white hover:bg-blue-500 transition">
+                  Sign up
+                </Link>
+              </>
+            )}
+          </div>
         </div>
       </header>
 
