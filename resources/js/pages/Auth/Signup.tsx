@@ -1,19 +1,21 @@
 import React from 'react';
 import { useForm, Link } from '@inertiajs/react';
 
-export default function Login(): React.JSX.Element {
-  // Inertia Form Hook manages values, errors, and processing states automatically
+export default function Register(): React.JSX.Element {
+  // Initialize Inertia form state tracker with strong validation defaults
   const { data, setData, post, processing, errors, reset } = useForm({
+    name: '',
     email: '',
     password: '',
-    remember: false,
+    password_confirmation: '',
   });
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
-    
-    post('/login', {
-      onFinish: () => reset('password'), // Wipe the password field if login fails
+
+    // Sends a POST request to your backend register route
+    post('/signup', {
+      onFinish: () => reset('password', 'password_confirmation'), // Clear passwords safely if error occurs
     });
   };
 
@@ -24,12 +26,12 @@ export default function Login(): React.JSX.Element {
           NEXUS<span className="text-blue-600">LABS</span>
         </div>
         <h2 className="mt-6 text-center text-3xl font-extrabold tracking-tight text-slate-900">
-          Sign in to your account
+          Create your account
         </h2>
         <p className="mt-2 text-center text-sm text-slate-600">
-          Or{' '}
-          <Link href="/signup" className="font-medium text-blue-600 hover:text-blue-500 transition">
-            create a new customer profile
+          Already registered?{' '}
+          <Link href="/login" className="font-medium text-blue-600 hover:text-blue-500 transition">
+            Sign in to your profile instead
           </Link>
         </p>
       </div>
@@ -37,8 +39,36 @@ export default function Login(): React.JSX.Element {
       <div className="mt-8 sm:mx-auto w-full max-w-md">
         <div className="bg-white px-4 py-8 shadow-sm rounded-2xl border border-slate-200 sm:px-10">
           
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            {/* EMAIL FIELD */}
+          <form className="space-y-5" onSubmit={handleSubmit}>
+            
+            {/* FULL NAME FIELD */}
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium text-slate-700">
+                Full Name
+              </label>
+              <div className="mt-1">
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  autoComplete="name"
+                  required
+                  value={data.name}
+                  onChange={(e) => setData('name', e.target.value)}
+                  className={`block w-full rounded-lg border px-3 py-2 text-slate-900 placeholder-slate-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition text-sm ${
+                    errors.name 
+                      ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20' 
+                      : 'border-slate-300 focus:border-blue-500'
+                  }`}
+                  placeholder="John Doe"
+                />
+              </div>
+              {errors.name && (
+                <p className="mt-2 text-xs font-medium text-red-600">{errors.name}</p>
+              )}
+            </div>
+
+            {/* EMAIL ADDRESS FIELD */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-slate-700">
                 Email address
@@ -60,7 +90,6 @@ export default function Login(): React.JSX.Element {
                   placeholder="you@example.com"
                 />
               </div>
-              {/* SERVER-SIDE VALIDATION ERROR DISPLAY */}
               {errors.email && (
                 <p className="mt-2 text-xs font-medium text-red-600">{errors.email}</p>
               )}
@@ -76,7 +105,7 @@ export default function Login(): React.JSX.Element {
                   id="password"
                   name="password"
                   type="password"
-                  autoComplete="current-password"
+                  autoComplete="new-password"
                   required
                   value={data.password}
                   onChange={(e) => setData('password', e.target.value)}
@@ -93,31 +122,31 @@ export default function Login(): React.JSX.Element {
               )}
             </div>
 
-            {/* REMEMBER ME & FORGOT PASSWORD BOX */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
+            {/* PASSWORD CONFIRMATION FIELD */}
+            <div>
+              <label htmlFor="password_confirmation" className="block text-sm font-medium text-slate-700">
+                Confirm Password
+              </label>
+              <div className="mt-1">
                 <input
-                  id="remember"
-                  name="remember"
-                  type="checkbox"
-                  checked={data.remember}
-                  onChange={(e) => setData('remember', e.target.checked)}
-                  className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500/20 transition"
+                  id="password_confirmation"
+                  name="password_confirmation"
+                  type="password"
+                  autoComplete="new-password"
+                  required
+                  value={data.password_confirmation}
+                  onChange={(e) => setData('password_confirmation', e.target.value)}
+                  className={`block w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 placeholder-slate-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition text-sm`}
+                  placeholder="••••••••"
                 />
-                <label htmlFor="remember" className="ml-2 block text-sm text-slate-700 select-none">
-                  Remember me
-                </label>
               </div>
-
-              <div className="text-sm">
-                <Link href="/forgot-password" className="font-medium text-blue-600 hover:text-blue-500 transition">
-                  Forgot your password?
-                </Link>
-              </div>
+              {errors.password_confirmation && (
+                <p className="mt-2 text-xs font-medium text-red-600">{errors.password_confirmation}</p>
+              )}
             </div>
 
-            {/* SUBMIT ACTION BUTTON */}
-            <div>
+            {/* SUBMIT REGISTRATION BUTTON */}
+            <div className="pt-2">
               <button
                 type="submit"
                 disabled={processing}
@@ -125,15 +154,14 @@ export default function Login(): React.JSX.Element {
               >
                 {processing ? (
                   <span className="flex items-center gap-2">
-                    {/* Clean Minimal CSS Loading Spinner */}
                     <svg className="h-4 w-4 animate-spin text-white" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                     </svg>
-                    Authenticating...
+                    Creating account...
                   </span>
                 ) : (
-                  'Sign In'
+                  'Register Account'
                 )}
               </button>
             </div>
