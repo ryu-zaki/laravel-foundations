@@ -13,11 +13,7 @@ use Illuminate\Notifications\Notifiable;
 #[Fillable([
     'name',
     'email',
-    'password',
-    'phone',
-    'address',
-    'is_active',
-    'role',
+    'password'
 ])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
