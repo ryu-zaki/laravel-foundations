@@ -31,12 +31,12 @@ class LoginController extends Controller
 
         // Access 'remember' checkbox safely as a boolean
         $remember = $request->boolean('remember');
- dd($request->all());
+ 
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
            
-            // Redirect back to intended page or fall back to dashboard/home
-            return redirect()->intended('/');
+            // Redirect back to intended page or fall back to profile
+            return redirect()->intended('/profile');
         }
 
         // Throw error back to the frontend if authentication fails
